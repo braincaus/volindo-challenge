@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Activity
+from core.models import Activity, Ticket
 
 
 class ActivitySerializer(serializers.HyperlinkedModelSerializer):
@@ -11,3 +11,9 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         fields = (
             'id', 'url', 'activity', 'type', 'capacity', 'participants', 'price', 'date', 'key', 'accessibility',
         )
+
+
+class TicketSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = '__all__'
