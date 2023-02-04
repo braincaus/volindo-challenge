@@ -1,5 +1,5 @@
 from django.utils import timezone
-from rest_framework import viewsets, permissions, mixins, status
+from rest_framework import viewsets, permissions, mixins, status, authentication
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -14,6 +14,9 @@ class ActivityViewSet(mixins.ListModelMixin,
                       mixins.RetrieveModelMixin,
                       viewsets.GenericViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    authentication_classes = [
+        authentication.BasicAuthentication, authentication.SessionAuthentication, authentication.TokenAuthentication
+    ]
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
 
@@ -58,6 +61,9 @@ class TicketViewSet(mixins.ListModelMixin,
                     mixins.RetrieveModelMixin,
                     viewsets.GenericViewSet):
     permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = [
+        authentication.BasicAuthentication, authentication.SessionAuthentication, authentication.TokenAuthentication
+    ]
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
 
