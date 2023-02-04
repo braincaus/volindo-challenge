@@ -14,6 +14,9 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TicketSerializer(serializers.HyperlinkedModelSerializer):
+    user = serializers.SlugRelatedField(slug_field='email', read_only=True)
+    activity = ActivitySerializer()
+
     class Meta:
         model = Ticket
         fields = '__all__'
