@@ -34,9 +34,11 @@ class ActivityViewSet(mixins.ListModelMixin,
         activities = Activity.objects.filter(ticket__user=request.user, ticket__status=False, ticket__canceled=False)
         my_activities = activities.values_list('id', flat=True)
         activities = Activity.objects.filter(date__gte=timezone.now()).exclude(id__in=my_activities)
-        activity = random.choice(activities)
-        activities = ActivitySerializer(instance=activity, context={'request': request})
-        return Response(data=activities.data, status=status.HTTP_200_OK)
+        if activities:
+            activity = random.choice(activities)
+            activities = ActivitySerializer(instance=activity, context={'request': request})
+            return Response(data=activities.data, status=status.HTTP_200_OK)
+        return Response(data={}, status=status.HTTP_200_OK)
 
     @action(
         methods=('get',), detail=False, url_path='my_activities', url_name='my_activities',
