@@ -17,6 +17,7 @@ class Activity(models.Model):
     participants = models.IntegerField(default=0)
     price = models.FloatField(default=0)
     date = models.DateTimeField()
+    link = models.URLField(blank=True, null=True)
     key = models.CharField(max_length=20, blank=True, null=True)
     accessibility = models.FloatField()
 

@@ -11,4 +11,5 @@ class ActivityTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Activity)
 class ActivityAdmin(admin.ModelAdmin):
+    list_display = ('activity', 'type', 'date')
     readonly_fields = ('participants', 'created_at', 'updated_at', )
