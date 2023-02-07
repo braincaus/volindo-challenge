@@ -1,11 +1,12 @@
-import random
-
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.db.models import Count
 from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, mixins, status, authentication
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action, api_view
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -24,23 +25,41 @@ class ActivityViewSet(mixins.ListModelMixin,
     ]
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['type', ]
+    search_fields = ['activity', ]
+    ordering_fields = ['id', 'capacity', 'participants', 'price', ]
 
     def get_queryset(self):
         queryset = super(ActivityViewSet, self).get_queryset()
-        queryset = queryset.filter(date__gte=timezone.now())
+        queryset = queryset.filter(date__gte=timezone.now()).order_by('date')
         return queryset
 
     @action(
         methods=('get',), detail=False, url_path='recommendation', url_name='recommendation',
         permission_classes=[IsAuthenticated])
     def recommendation(self, request):
-        activities = Activity.objects.filter(ticket__user=request.user, ticket__status=False, ticket__canceled=False)
-        my_activities = activities.values_list('id', flat=True)
+        user_id = request.user.id
+
+        activity_types = Activity.objects.filter(
+            ticket__user__id=user_id, ticket__status=False,ticket__canceled=False
+        ).values('type').annotate(type_count=Count('type')).order_by('-type_count')
+
+        my_activities = Activity.objects.filter(
+            ticket__user__id=user_id, ticket__status=False, ticket__canceled=False).values_list('id', flat=True)
+
         activities = Activity.objects.filter(date__gte=timezone.now()).exclude(id__in=my_activities)
+
+        for activity_type in activity_types:
+            if activities.filter(type=activity_type['type']):
+                activities = activities.filter(type=activity_type['type'])
+                break
+
         if activities:
-            activity = random.choice(activities)
-            activities = ActivitySerializer(instance=activity, context={'request': request})
-            return Response(data=activities.data, status=status.HTTP_200_OK)
+            activities = activities.order_by('-participants', 'date')
+            activity = activities.first()
+            activity = ActivitySerializer(instance=activity, context={'request': request})
+            return Response(data=activity.data, status=status.HTTP_200_OK)
         return Response(data={}, status=status.HTTP_200_OK)
 
     @action(
@@ -52,7 +71,7 @@ class ActivityViewSet(mixins.ListModelMixin,
         return Response(data=activities.data, status=status.HTTP_200_OK)
 
     @action(
-        methods=('post',), detail=True, url_path='purchase', url_name='purchase',
+        methods=('post', 'get',), detail=True, url_path='purchase', url_name='purchase',
         permission_classes=[IsAuthenticated])
     def purchase(self, request, pk):
         activity = self.get_object()
@@ -91,7 +110,7 @@ class TicketViewSet(mixins.ListModelMixin,
         return queryset
 
     @action(
-        methods=('post',),
+        methods=('post', 'get',),
         detail=True,
         url_path='done',
         url_name='done'
@@ -110,7 +129,7 @@ class TicketViewSet(mixins.ListModelMixin,
         return Response(data={"error": "It is no possible to mark done yet"}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(
-        methods=('post',),
+        methods=('post', 'get',),
         detail=True,
         url_path='cancel',
         url_name='cancel'
