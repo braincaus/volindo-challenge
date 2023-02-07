@@ -4,6 +4,7 @@ info:
   version: '1.0.0'
 servers:
   - url: http://localhost:8001
+  - url: https://volindo-dot-speedy-cargo-373105.uc.r.appspot.com
 paths:
   /activities/:
     get:
