@@ -1,8 +1,11 @@
 import random
 
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.utils import timezone
 from rest_framework import viewsets, permissions, mixins, status, authentication
-from rest_framework.decorators import action
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -49,7 +52,7 @@ class ActivityViewSet(mixins.ListModelMixin,
         return Response(data=activities.data, status=status.HTTP_200_OK)
 
     @action(
-        methods=('get', 'post'), detail=True, url_path='purchase', url_name='purchase',
+        methods=('post',), detail=True, url_path='purchase', url_name='purchase',
         permission_classes=[IsAuthenticated])
     def purchase(self, request, pk):
         activity = self.get_object()
@@ -88,7 +91,7 @@ class TicketViewSet(mixins.ListModelMixin,
         return queryset
 
     @action(
-        methods=('get', 'post'),
+        methods=('post',),
         detail=True,
         url_path='done',
         url_name='done'
@@ -107,7 +110,7 @@ class TicketViewSet(mixins.ListModelMixin,
         return Response(data={"error": "It is no possible to mark done yet"}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(
-        methods=('get', 'post'),
+        methods=('post',),
         detail=True,
         url_path='cancel',
         url_name='cancel'
@@ -125,3 +128,31 @@ class TicketViewSet(mixins.ListModelMixin,
             return Response(data={"error": "It is already marked done."}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(data={"error": "It was cancelled before."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def signin(request):
+    data = request.data
+    username = data['username']
+    password = data['password']
+
+    if not User.objects.filter(username=username):
+        user = User.objects.create_user(username=username, password=password)
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key})
+
+    return Response(data={'error': 'email already used'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def login(request):
+    data = request.data
+    username = data['username']
+    password = data['password']
+
+    user = authenticate(request, username=username, password=password)
+    if user:
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key})
+
+    return Response(data={'error': 'review your credentials'}, status=status.HTTP_400_BAD_REQUEST)

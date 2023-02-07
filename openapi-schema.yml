@@ -1,0 +1,398 @@
+openapi: 3.0.2
+info:
+  title: 'Volindo Challenge - Recommender'
+  version: '1.0.0'
+servers:
+  - url: http://localhost:8001
+  - url: https://volindo-dot-speedy-cargo-373105.uc.r.appspot.com
+paths:
+  /activities/:
+    get:
+      operationId: listActivitys
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+          description: ''
+      tags:
+      - activities
+  /activities/my_activities/:
+    get:
+      operationId: myActivitiesActivity
+      description: ''
+      parameters: []
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+          description: ''
+      tags:
+      - activities
+  /activities/recommendation/:
+    get:
+      operationId: recommendationActivity
+      description: ''
+      parameters: []
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+          description: ''
+      tags:
+      - activities
+  /activities/{id}/:
+    get:
+      operationId: retrieveActivity
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this activity.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+          description: ''
+      tags:
+      - activities
+  /tickets/:
+    get:
+      operationId: listTickets
+      description: ''
+      parameters: []
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ticket'
+          description: ''
+      tags:
+      - tickets
+  /tickets/{id}/:
+    get:
+      operationId: retrieveTicket
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this ticket.
+        schema:
+          type: string
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+          description: ''
+      tags:
+      - tickets
+  /activities/{id}/purchase/:
+    post:
+      operationId: purchaseActivity
+      description: ''
+      security:
+        - bearerAuth: [ ]
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this activity.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Activity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Activity'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+          description: ''
+      tags:
+      - activities
+  /tickets/{id}/cancel/:
+    post:
+      operationId: cancelTicket
+      description: ''
+      security:
+        - bearerAuth: [ ]
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this ticket.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ticket'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Ticket'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Ticket'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+          description: ''
+      tags:
+      - tickets
+  /tickets/{id}/done/:
+    post:
+      operationId: doneTicket
+      description: ''
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this ticket.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ticket'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Ticket'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Ticket'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+          description: ''
+      tags:
+      - tickets
+  /signin/:
+    post:
+      operationId: createsignin
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+      tags:
+      - signin
+  /login/:
+    post:
+      operationId: createlogin
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+      tags:
+      - login
+  /api-token-auth/:
+    post:
+      operationId: createAuthToken
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+          description: ''
+      tags:
+      - api-token-auth
+components:
+  schemas:
+    Activity:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        url:
+          type: string
+          readOnly: true
+        activity:
+          type: string
+          maxLength: 100
+        type:
+          type: string
+          readOnly: true
+        capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        participants:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        price:
+          type: number
+        date:
+          type: string
+          format: date-time
+        key:
+          type: string
+          nullable: true
+          maxLength: 20
+        accessibility:
+          type: number
+      required:
+      - activity
+      - date
+      - accessibility
+    Ticket:
+      type: object
+      properties:
+        url:
+          type: string
+          readOnly: true
+        user:
+          type: string
+          readOnly: true
+        activity:
+          type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            url:
+              type: string
+              readOnly: true
+            activity:
+              type: string
+              maxLength: 100
+            type:
+              type: string
+              readOnly: true
+            capacity:
+              type: integer
+              maximum: 2147483647
+              minimum: -2147483648
+            participants:
+              type: integer
+              maximum: 2147483647
+              minimum: -2147483648
+            price:
+              type: number
+            date:
+              type: string
+              format: date-time
+            key:
+              type: string
+              nullable: true
+              maxLength: 20
+            accessibility:
+              type: number
+          required:
+          - activity
+          - date
+          - accessibility
+        status:
+          type: boolean
+        canceled:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - activity
+    AuthToken:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        token:
+          type: string
+          readOnly: true
+      required:
+      - username
+      - password
+  securitySchemes:
+    ApiKeyAuth: # arbitrary name for the security scheme
+      type: apiKey
+      in: header       # can be "header", "query" or "cookie"
+      name: Authorization
+
